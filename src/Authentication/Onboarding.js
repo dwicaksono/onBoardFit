@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import Animated, { multiply } from "react-native-reanimated";
 
@@ -13,6 +13,7 @@ import {
 
 import Slide from "../components/Slider";
 import SubSlide from "../components/SubSlide";
+import Dot from "../components/Dot";
 
 const slideData = [
     {
@@ -46,10 +47,10 @@ const slideData = [
 ];
 
 const Onboarding = () => {
-    const x = useValue(0);
-    // TODO: scrollHandler useScrollHandler
+    // const scroll = useRef < Animated.ScrollView > null;
+    const scroll = useRef(new Animated.ScrollView(0)).current;
 
-    const onScroll = onScrollEvent({ x });
+    const { scrollHandler, x } = useScrollHandler();
 
     const backgroundColor = interpolateColor(x, {
         inputRange: slideData.map((_, i) => i * width),
@@ -58,19 +59,15 @@ const Onboarding = () => {
     return (
         <View style={styles.contianerScreen}>
             <Animated.View style={[styles.slider, { backgroundColor }]}>
-                {/* <Animated.View
-                style={{ ...styles.slider, backgroundColor: "cyan" }}
-            > */}
                 <Animated.ScrollView
+                    ref={scroll}
                     horizontal
                     snapToInterval={width}
                     decelerationRate="fast"
                     showsHorizontalScrollIndicator={false}
                     bounces={false}
                     scrollEventThrottle={1}
-                    // onScroll={onScrollEvent({ x })}
-
-                    {...{ onScroll }}
+                    {...scrollHandler}
                 >
                     {slideData.map(({ title }, idx) => (
                         <Slide {...{ title }} key={idx} />
@@ -90,11 +87,20 @@ const Onboarding = () => {
                         {
                             width: width * slideData.length,
                             flex: 1,
-                            flexDirection: "row",
+                            // flexDirection: "row",
                             transform: [{ translateX: multiply(x, -1) }],
                         },
                     ]}
                 >
+                    <View style={styles.pagination}>
+                        {slideData.map((_, index) => (
+                            <Dot
+                                key={index}
+                                currentIndex={index}
+                                {...{ index, x }}
+                            />
+                        ))}
+                    </View>
                     {slideData.map(({ subtitle, description }, idx) => (
                         <SubSlide
                             {...{ subtitle, description }}
@@ -102,6 +108,14 @@ const Onboarding = () => {
                                 (item) => slideData.length - 1 === idx
                             )}
                             key={idx}
+                            onPress={() => {
+                                if (scroll.current) {
+                                    scroll.current.getNode().scrollTo({
+                                        x: width * (idx + 1),
+                                        animated: true,
+                                    });
+                                }
+                            }}
                         />
                     ))}
                 </Animated.View>
@@ -121,6 +135,7 @@ const styles = StyleSheet.create({
     footerContainer: {
         backgroundColor: "white",
         borderTopLeftRadius: 75,
+        flexDirection: "row",
     },
     slider: {
         height: 0.68 * height,
@@ -128,5 +143,15 @@ const styles = StyleSheet.create({
     },
     footer: {
         flex: 1,
+    },
+    pagination: {
+        ...StyleSheet.absoluteFillObject,
+        height: 45,
+        // width: width * slideData.length,
+        width,
+        justifyContent: "center",
+        alignItems: "center",
+        // flex: 1,
+        flexDirection: "row",
     },
 });

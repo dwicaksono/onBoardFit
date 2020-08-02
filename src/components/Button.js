@@ -1,11 +1,14 @@
 import React from "react";
 import { RectButto } from "react-native-gesture-handler";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Platform } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 
 const Button = (props) => {
     return (
-        <RectButton style={{ ...styles.container, ...props.style }}>
+        <RectButton
+            style={{ ...styles.container, ...props.style }}
+            onPress={props.onPress}
+        >
             <Text style={styles.label}>{props.title}</Text>
         </RectButton>
     );
@@ -19,7 +22,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         alignContent: "center",
-        borderRadius: 50,
+        borderRadius: Platform.OS === "android" ? 50 : 25,
     },
     label: {
         fontFamily: "pro-text-semibold",

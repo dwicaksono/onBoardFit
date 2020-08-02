@@ -4,7 +4,7 @@ import Animated from "react-native-reanimated";
 
 import Button from "./Button";
 
-const SubSlide = ({ subtitle, description, last }) => {
+const SubSlide = ({ subtitle, description, last, onPress }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.subtitle}>{subtitle}</Text>
@@ -12,6 +12,7 @@ const SubSlide = ({ subtitle, description, last }) => {
             <Button
                 title={last ? "Let's get started" : "next"}
                 style={last ? styles.primary : styles.default}
+                {...{ onPress }}
             />
         </View>
     );
@@ -25,6 +26,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         padding: 44,
+        // width,
     },
     subtitle: {
         fontFamily: "pro-text-semibold",
