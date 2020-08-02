@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
-import Animated, { multiply } from "react-native-reanimated";
+import Animated, { multiply, divide } from "react-native-reanimated";
 
 import { ScrollView } from "react-native-gesture-handler";
 import {
@@ -22,6 +22,7 @@ const slideData = [
         description:
             "Confused about your outfit? Don't worry! Find The Best Outfit here",
         color: "#00cec9",
+        picture: require("../../assets/img/1.png"),
     },
     {
         title: "Playful",
@@ -29,6 +30,7 @@ const slideData = [
         description:
             "Hatting clothes in your wardrobe? Explore hundreds of outfit ideas",
         color: "#fdcb6e",
+        picture: require("../../assets/img/2.png"),
     },
     {
         title: "Excentric",
@@ -36,6 +38,7 @@ const slideData = [
         description:
             "Create your individual & unique style and look amazing everyday",
         color: "#e84393",
+        picture: require("../../assets/img/3.png"),
     },
     {
         title: "Funky",
@@ -43,6 +46,7 @@ const slideData = [
         description:
             "Discovery the latest trends in fashion and explore your personality",
         color: "#6c5ce7",
+        picture: require("../../assets/img/4.png"),
     },
 ];
 
@@ -56,6 +60,10 @@ const Onboarding = () => {
         inputRange: slideData.map((_, i) => i * width),
         outputRange: slideData.map((slide) => slide.color),
     });
+    const bagi = (x, index) => {
+        x = devide(x, index);
+        return x;
+    };
     return (
         <View style={styles.contianerScreen}>
             <Animated.View style={[styles.slider, { backgroundColor }]}>
@@ -69,8 +77,8 @@ const Onboarding = () => {
                     scrollEventThrottle={1}
                     {...scrollHandler}
                 >
-                    {slideData.map(({ title }, idx) => (
-                        <Slide {...{ title }} key={idx} />
+                    {slideData.map(({ title, picture }, idx) => (
+                        <Slide {...{ title, picture }} key={idx} />
                     ))}
                 </Animated.ScrollView>
             </Animated.View>
@@ -81,44 +89,43 @@ const Onboarding = () => {
                         backgroundColor,
                     }}
                 />
-                <Animated.View
-                    style={[
-                        styles.footerContainer,
-                        {
-                            width: width * slideData.length,
-                            flex: 1,
-                            // flexDirection: "row",
-                            transform: [{ translateX: multiply(x, -1) }],
-                        },
-                    ]}
-                >
+                <View style={styles.footerContainer}>
                     <View style={styles.pagination}>
                         {slideData.map((_, index) => (
                             <Dot
                                 key={index}
-                                currentIndex={index}
+                                currentIndex={x}
                                 {...{ index, x }}
                             />
                         ))}
                     </View>
-                    {slideData.map(({ subtitle, description }, idx) => (
-                        <SubSlide
-                            {...{ subtitle, description }}
-                            last={slideData.some(
-                                (item) => slideData.length - 1 === idx
-                            )}
-                            key={idx}
-                            onPress={() => {
-                                if (scroll.current) {
-                                    scroll.current.getNode().scrollTo({
-                                        x: width * (idx + 1),
-                                        animated: true,
-                                    });
-                                }
-                            }}
-                        />
-                    ))}
-                </Animated.View>
+                    <Animated.View
+                        style={{
+                            flex: 1,
+                            flexDirection: "row",
+                            width: width * slideData.length,
+                            transform: [{ translateX: multiply(x, -1) }],
+                        }}
+                    >
+                        {slideData.map(({ subtitle, description }, idx) => (
+                            <SubSlide
+                                {...{ subtitle, description }}
+                                last={slideData.some(
+                                    (item) => slideData.length - 1 === idx
+                                )}
+                                key={idx}
+                                onPress={() => {
+                                    if (scroll.current) {
+                                        scroll.current.getNode().scrollTo({
+                                            x: width * (idx + 1),
+                                            animated: true,
+                                        });
+                                    }
+                                }}
+                            />
+                        ))}
+                    </Animated.View>
+                </View>
             </View>
         </View>
     );
@@ -135,7 +142,7 @@ const styles = StyleSheet.create({
     footerContainer: {
         backgroundColor: "white",
         borderTopLeftRadius: 75,
-        flexDirection: "row",
+        flex: 1,
     },
     slider: {
         height: 0.68 * height,
@@ -147,11 +154,8 @@ const styles = StyleSheet.create({
     pagination: {
         ...StyleSheet.absoluteFillObject,
         height: 45,
-        // width: width * slideData.length,
-        width,
         justifyContent: "center",
         alignItems: "center",
-        // flex: 1,
         flexDirection: "row",
     },
 });
